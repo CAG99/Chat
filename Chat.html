@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Chat v 1.0</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Oswald">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open Sans">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style>
+        h1,h2,h3,h4,h5,h6 {font-family: "Oswald"}
+        body {font-family: "Open Sans"}
+
+        h1 {
+            padding-left: 10px;
+        }
+        
+        body {
+            background-image: url("bakgrunn.jpg");
+            background-size: cover;
+        }
+        form {
+            padding: 10px;
+        }
+
+        #skjema {
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<script src="https://www.gstatic.com/firebasejs/4.9.1/firebase.js"></script>
+<script>
+    // Initialize Firebase
+    var config = {
+        apiKey: "AIzaSyBv6dL1cPUk6Q9B3q1eiHDHEZ1O2WsIgFU",
+        authDomain: "chat-c6d57.firebaseapp.com",
+        databaseURL: "https://chat-c6d57.firebaseio.com",
+        projectId: "chat-c6d57",
+        storageBucket: "chat-c6d57.appspot.com",
+        messagingSenderId: "607097855774"
+    };
+    firebase.initializeApp(config);
+</script>
+
+<main>
+    <h1>Omegle</h1>
+
+    <form id="skjema">
+        <label for="impbruker">Bruker:</label>
+        <input type="text" id="impbruker" placeholder="Hvem er du?">
+        <label for="impmelding">Melding:</label>
+        <input type="text" id="impmelding" placeholder="Hva sier du?">
+        <button type="submit">OK</button>
+    </form>
+
+    <!-- Her kommer det meldinger -->
+    <article id="txtMeldinger">
+
+    </article>
+</main>
+
+<script >
+    var txtMeldinger = document.getElementById("txtMeldinger");
+    var skjema = document.getElementById("skjema");
+    var impbruker = document.getElementById("impbruker");
+    var impmelding = document.getElementById("impmelding");
+
+
+    var database = firebase.database();
+    var meldinger = database.ref("meldinger");
+
+/*
+    var nyMelding ={
+        "avsender":"Casper",
+        "tekst":"Velkommen til denne lekne chatten",
+    };
+
+    meldinger.push(nyMelding);
+*/
+
+    function visMelding(snapshot) {
+        var melding = snapshot.val();
+        txtMeldinger.innerHTML += `<p><b>${melding.avsender}<b><i> sier ${melding.tekst}</i></p>`
+
+    }
+
+    meldinger.on("child_added", visMelding);
+
+    function regNyMelding(event) {
+        event.preventDefault();
+
+        var nyMelding = {
+            "avsender" : impbruker.value,
+            "tekst" : impmelding.value
+        };
+
+
+        meldinger.push(nyMelding);
+        impmelding.value = "";
+    }
+
+
+    //Registrerer vår lyttefunksjon
+    skjema.onsubmit = regNyMelding;
+
+</script>
+
+
+</body>
+</html>
